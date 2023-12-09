@@ -1,0 +1,16 @@
+----------------------------------------
+Start of task1 Testing
+
+get_file_parameters(sample1.txt ) = ['$name:sample1.txt$', '$type:text$', '$size:607$']
+get_file_parameters(sample2.html) = ['$name:sample2.html$', '$type:text$', '$size:406$']
+get_file_parameters(sample3.rtf ) = ['$name:sample3.rtf$', '$type:text$', '$size:42649$']
+get_file_parameters(sample4.png ) = ['$name:sample4.png$', '$type:pic$', '$size:4520$']
+get_file_parameters(sample5.jpg ) = ['$name:sample5.jpg$', '$type:pic$', '$size:7876$']
+get_file_parameters(sample6.gif ) = ['$name:sample6.gif$', '$type:pic$']
+get_file_parameters(sample7.pdf ) = ['$name:sample7.pdf$', '$size:3028$']
+get_file_parameters(readme      ) = []
+get_file_parameters(readme.txt  ) = ['$name:readme.txt$', '$type:text$']
+get_file_parameters(readme.pdf  ) = ['$name:readme.pdf$']
+
+End of task1 Testing
+----------------------------------------
