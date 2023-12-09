@@ -1,71 +1,76 @@
-#-------------------------
+# -------------------------
 # Network Programming and Applications
 # First Semester (2023-2024)
 # Assignment 2
-#-------------------------
+# -------------------------
 
-#-------------------------
+# -------------------------
 # Student Name: Abdullrahman Wasfi
 # Student ID  : 20190270
-#-------------------------
+# -------------------------
 
 # put your import statements between these two lines
-#----------------------------------
-from socket import socket, AF_INET, SOCK_STREAM, SHUT_RDWR
-#----------------------------------
+# ----------------------------------
+from socket import socket, AF_INET, SOCK_STREAM, SHUT_RDWR, SOL_SOCKET, SO_ERROR
 
-BUFFER = 64                             #receive buffer for commands
-ENCODING = 'utf-8'                      #encoding used by both ends
-SERVER_ADDRESS = ('localhost',6330)     #server socket address
-BACKLOG = 6                             #listen backlog
-BLOCK_SIZE = 128                        #block size for upload/download
-TEXT_EXTENSIONS = ['txt','rtf','html']  #valid text file extensions
-PIC_EXTENSIONS = ['png','jpg','gif']    #valid picture file extensions
+# ----------------------------------
 
-def write(file,msg):
-    fh = open(file,'a')
+BUFFER = 64  # receive buffer for commands
+ENCODING = 'utf-8'  # encoding used by both ends
+SERVER_ADDRESS = ('localhost', 6330)  # server socket address
+BACKLOG = 6  # listen backlog
+BLOCK_SIZE = 128  # block size for upload/download
+TEXT_EXTENSIONS = ['txt', 'rtf', 'html']  # valid text file extensions
+PIC_EXTENSIONS = ['png', 'jpg', 'gif']  # valid picture file extensions
+
+
+def write(file, msg):
+    fh = open(file, 'a')
     fh.write(str(msg))
     fh.close()
     return
 
+
 '_______________________________________________________________'
+
+
 # DONE
-def prepare_socket(filename,sock_type='client',address=None):
+def prepare_socket(filename, sock_type='client', address=None):
     sock = None
-    
+
     if sock_type == 'client':
         try:
             sock = socket(AF_INET, SOCK_STREAM)
-            write(filename, 'stp(client): socket created')
+            write(filename, 'stp(client): socket created\n')
 
         except:
-            write(filename, 'stp(client): socket creation failed')
+            write(filename, 'stp(client): socket creation failed\n')
             return None
 
-        
+
     elif sock_type == 'server':
         try:
             sock = socket(AF_INET, SOCK_STREAM)
-            write(filename, 'stp(server): socket created')
+            write(filename, 'stp(server): socket created\n')
             try:
                 sock.bind(address)
-                write(filename, 'stp(server): bound to {}'.format(address))
+                write(filename, 'stp(server): bound to {}\n'.format(address))
                 try:
                     sock.listen()
-                    write(filename, 'stp(server): listening ...\n')
+                    write(filename, 'stp(server): listening ...\n\n')
                 except:
-                    write(filename, 'stp(server): listen fatal error')
+                    write(filename, 'stp(server): listen fatal error\n')
                     return None
-                    
+
             except:
-                write(filename, 'stp(server): bind fatal error')
+                write(filename, 'stp(server): bind fatal error\n')
                 return None
         except:
-            write(filename, 'stp(server): socket creation failed')
-            return None        
-        
+            write(filename, 'stp(server): socket creation failed\n')
+            return None
+
     return sock
-        
+
     """
     ----------------------------------------------------
     Parameters:   filename (str)
@@ -100,9 +105,11 @@ def prepare_socket(filename,sock_type='client',address=None):
     # your code here
     return 'None'
 
+
 '_______________________________________________________________'
 
-def stp_server(filename,server_address,client_count):
+
+def stp_server(filename, server_address, client_count):
     """
     ----------------------------------------------------
     Parameters:   filename (str)
@@ -121,9 +128,11 @@ def stp_server(filename,server_address,client_count):
     # your code here
     return
 
+
 '_______________________________________________________________'
 
-def handle_client(filename,connection):
+
+def handle_client(filename, connection):
     """
     ----------------------------------------------------
     Parameters:   filename (str)
@@ -142,9 +151,11 @@ def handle_client(filename,connection):
     # your code here
     return
 
+
 '_______________________________________________________________'
 
-def receive_commands(filename,connection):
+
+def receive_commands(filename, connection):
     """
     ----------------------------------------------------
     Parameters:   filename (str)
@@ -166,9 +177,62 @@ def receive_commands(filename,connection):
     # your code here
     return None
 
+
 '_______________________________________________________________'
 
+
 def validate_configuration(commands):
+    if not valid_commands_format(commands):
+        return ('#10:ILLEGAL_COMMAND#', [])
+    else:
+        hasname = False
+        hastype = False
+        hassize = False
+        for c in commands:
+            if 'name' in c:
+                fname = get_parameter_value(commands, 'name')
+                hasname = True
+            elif 'type' in c:
+                ftype = get_parameter_value(commands, 'type')
+                hastype = True
+            elif 'size' in c:
+                fsize = get_parameter_value(commands, 'size')
+                hassize = True
+
+        if hasname and hastype and hassize:
+            for c in commands:
+                if 'name' in c:
+                    if fname is None or not valid_filename(fname):
+                        return '#30:BAD_CONFIGURATION#', []
+
+                if 'type' in c:
+                    if ftype is None:
+                        return '#30:BAD_CONFIGURATION#', []
+                    else:
+                        dot_index = fname.rfind(".")
+                        if dot_index != -1:
+                            file_extension = fname[dot_index + 1:]
+                            if (file_extension not in TEXT_EXTENSIONS) and (file_extension not in PIC_EXTENSIONS):
+                                return '#30:BAD_CONFIGURATION#', []
+                        else:
+                            return '#30:BAD_CONFIGURATION#', []
+
+                if 'size' in c:
+
+                    if fsize is None:
+                        return '#30:BAD_CONFIGURATION#', []
+                    elif fsize.isdigit():
+                        sizevalue = int(fsize)
+                        if sizevalue < 1:
+                            return '#30:BAD_CONFIGURATION#', []
+                    else:
+                        return '#30:BAD_CONFIGURATION#', []
+
+
+            return '<configuration_approved>', commands
+        else:
+            return '#20:COMMAND_MISSING#', []
+
     """
     ----------------------------------------------------
     Parameters:   commands (list or str)
@@ -191,11 +255,13 @@ def validate_configuration(commands):
     ---------------------------------------------------
     """
     # your code here
-    return None    
+    return None
+
 
 '_______________________________________________________________'
 
-def download_file(out_filename,sock,commands):
+
+def download_file(out_filename, sock, commands):
     """
     ----------------------------------------------------
     Parameters:   out_filename (str)
@@ -220,7 +286,9 @@ def download_file(out_filename,sock,commands):
     # your code here
     return None
 
+
 '_______________________________________________________________'
+
 
 # DONE
 def get_file_parameters(filename):
@@ -228,7 +296,7 @@ def get_file_parameters(filename):
     # ['$name:sample1.txt$', '$type:text$', '$size:607$']
     list = []
     if dot_index != -1:
-        file_extension = filename[dot_index+1:]
+        file_extension = filename[dot_index + 1:]
         name = '$name:{}$'.format(filename)
         list.append(name)
         if file_extension.lower() in TEXT_EXTENSIONS:
@@ -246,14 +314,14 @@ def get_file_parameters(filename):
         elif file_extension.lower() in PIC_EXTENSIONS:
             type = '$type:pic$'
             list.append(type)
-         
+
         if file_extension.lower() not in TEXT_EXTENSIONS:
             try:
                 with open(filename, 'rb') as file:
                     byte_count = 0
                     while file.read(1):
                         byte_count += 1
-                    size ='$size:{}$'.format(byte_count)
+                    size = '$size:{}$'.format(byte_count)
                     list.append(size)
             except FileNotFoundError:
                 pass
@@ -277,46 +345,49 @@ def get_file_parameters(filename):
     # your code here
     return list
 
+
 '_______________________________________________________________'
 
+
 # DONE
-def close_socket(filename,sock,sock_type='client'):
+def close_socket(filename, sock, sock_type='client'):
     res = False
-    
-    if _is_socket_closed(sock):
+
+    if sock.fileno() == -1:
         return False
-    else:
-        if sock_type == 'client':
+
+    if sock_type == 'client':
+        try:
+            sock.send(b" ")
             try:
-                sock.send(b" ")
-                try:
-                    sock.shutdown(SHUT_RDWR)
-                    write(filename, 'stp(<clien>): connection shutdown')
-                    try:
-                        sock.close()
-                        write(filename, 'stp(<client>): socket closed')
-                        res = True
-                    except:
-                        write(filename, 'stp(<client>): socket close failed')
-                except:
-                    write(filename, 'stp(<type>): shutdown failed')
-            except socket.error as e:
+                sock.shutdown(SHUT_RDWR)
+                write(filename, 'stp(client): connection shutdown\n')
                 try:
                     sock.close()
-                    write(filename, 'stp(<client>): socket closed')
+                    write(filename, 'stp(client): socket closed\n')
                     res = True
                 except:
-                    write(filename, 'stp(<client>): socket close failed')
-            # res = True
-    
-        elif sock_type == 'server':
+                    write(filename, 'stp(client): socket close failed\n')
+            except:
+                write(filename, 'stp(client): shutdown failed\n')
+        except:
             try:
                 sock.close()
-                write(filename, 'stp(<server>): socket closed')
+                write(filename, 'stp(client): socket closed\n')
                 res = True
             except:
-                write(filename, 'stp(<sever>): socket close failed')
-        
+                write(filename, 'stp(client): socket close failed\n')
+        # res = True
+
+    elif sock_type == 'server':
+        try:
+            sock.close()
+            write(filename, 'stp(server): socket closed\n')
+            res = True
+        except Exception as e:
+            print(e)
+            write(filename, 'stp(server): socket close failed\n')
+
     return res
     """
     ----------------------------------------------------
@@ -345,9 +416,61 @@ def close_socket(filename,sock,sock_type='client'):
     # your code here
     return None
 
+
 '_______________________________________________________________'
 
+
 def valid_commands_format(commands):
+    result = False
+    if type(commands) is list:
+        if len(commands) == 0:
+            return False
+        else:
+            for c in commands:
+                dolars = 0
+                containSemi = False
+                if len(c) < 3:
+                    return False
+
+                if c[0] != '$' or c[-1] != '$':
+                    return False
+
+                for char in c:
+                    if dolars == 2:
+                        dolars = 0
+                        if char != '$' or not containSemi:
+                            return False
+                        if containSemi:
+                            containSemi = False
+
+                    if char == '$':
+                        dolars += 1
+                    elif char == ':':
+                        containSemi = True
+                result = True
+    else:
+        dolars = 0
+        containSemi = False
+        if len(commands) < 3:
+            return False
+
+        if commands[0] != '$' or commands[-1] != '$':
+            return False
+
+        for char in commands:
+            if dolars == 2:
+                dolars = 0
+                if char != '$' or not containSemi:
+                    return False
+                if containSemi:
+                    containSemi = False
+
+            if char == '$':
+                dolars += 1
+            elif char == ':':
+                containSemi = True
+
+        result = True
     """
     ----------------------------------------------------
     Parameters:   commands(str or list)
@@ -360,11 +483,13 @@ def valid_commands_format(commands):
     ---------------------------------------------------
     """
     # your code here
-    return None
+    return result
+
 
 '_______________________________________________________________'
 
-def get_parameter_value(commands,parameter):
+
+def get_parameter_value(commands, parameter):
     """
     ----------------------------------------------------
     Parameters:   commands (str or list)
@@ -378,12 +503,33 @@ def get_parameter_value(commands,parameter):
     Dependencies:  valid_commands_format
     ---------------------------------------------------
     """
-    # your code here
+    if valid_commands_format(commands):
+        if type(commands) is list:
+            for c in commands:
+                if parameter in c:
+                    start_index = c.find(':')
+                    end_index = c.find('$', start_index + 1)
+                    value = c[start_index + 1:end_index]
+                    return value
+        else:
+            start_index = commands.find('{}'.format(parameter))
+            val = commands[start_index:]
+            semi_index = val.rfind(":")
+            dollar_index = val.rfind("$")
+            if semi_index == -1 or dollar_index == -1:
+                return None
+            else:
+                val = val[semi_index + 1:dollar_index]
+
+            return val
+
     return None
+
 
 '_______________________________________________________________'
 
-def stp_client(out_filename,server,filename=None,commands=None):
+
+def stp_client(out_filename, server, filename=None, commands=None):
     """
     ----------------------------------------------------
     Parameters:   out_filename (str)
@@ -413,9 +559,11 @@ def stp_client(out_filename,server,filename=None,commands=None):
     # your code here
     return None
 
+
 '____________________________________________________'
 
-def connect_to_server(filename,sock,server,):
+
+def connect_to_server(filename, sock, server, ):
     """
     ----------------------------------------------------
     Parameters:   filename (str)
@@ -435,9 +583,11 @@ def connect_to_server(filename,sock,server,):
     # your code here
     return None
 
+
 '____________________________________________________'
 
-def send_commands(filename,sock,commands):
+
+def send_commands(filename, sock, commands):
     """
     ----------------------------------------------------
     Parameters:   filename (str)
@@ -457,9 +607,11 @@ def send_commands(filename,sock,commands):
     # your code here
     return None
 
+
 '____________________________________________________'
 
-def get_config_response(filename,sock):
+
+def get_config_response(filename, sock):
     """
     ----------------------------------------------------
     Parameters:   filename (str)
@@ -478,9 +630,11 @@ def get_config_response(filename,sock):
     # your code here
     return None
 
+
 '____________________________________________________'
 
-def upload_file(out_filename,sock,commands):
+
+def upload_file(out_filename, sock, commands):
     """
     ----------------------------------------------------
     Parameters:   out_filename (str)
@@ -501,6 +655,8 @@ def upload_file(out_filename,sock,commands):
     """
     # your code here
     return None
+
+
 '____________________________________________________'
 
 
@@ -525,15 +681,3 @@ def valid_filename(filename):
     if filename.count('.') != 1:
         return False
     return True
-
-
-
-def _is_socket_closed(sock):
-    try:
-        data = sock.recv(1, socket.MSG_PEEK)
-        if len(data) == 0:
-            return True  # Socket is closed
-    except socket.error as e:
-        return True
-
-    return False  # Socket is open

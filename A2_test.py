@@ -320,35 +320,35 @@ def main():
     except Exception as e1:
         print('Unhandled exception in task1: {}'.format(e1))
         
-    # try:
-    #     task2()
-    #     print('Task 2 Testing Complete')
-    # except Exception as e2:
-    #     print('Unhandled exception in task2: {}'.format(e2))
+    try:
+        task2()
+        print('Task 2 Testing Complete')
+    except Exception as e2:
+        print('Unhandled exception in task2: {}'.format(e2))
     
-    # try:        
-    #     task3()
-    #     print('Task 3 Testing Complete')
-    # except Exception as e3:
-    #     print('Unhandled exception in task3: {}'.format(e3))
+    try:
+        task3()
+        print('Task 3 Testing Complete')
+    except Exception as e3:
+        print('Unhandled exception in task3: {}'.format(e3))
     
-    # try:        
-    #     task4()
-    #     print('Task 4 Testing Complete')
-    # except Exception as e4:
-    #     print('Unhandled exception in task4: {}'.format(e4))
+    try:
+        task4()
+        print('Task 4 Testing Complete')
+    except Exception as e4:
+        print('Unhandled exception in task4: {}'.format(e4))
     
-    # try:        
-    #     task5()
-    #     print('Task 5 Testing Complete')
-    # except Exception as e5:
-    #     print('Unhandled exception in task5: {}'.format(e5))
+    try:
+        task5()
+        print('Task 5 Testing Complete')
+    except Exception as e5:
+        print('Unhandled exception in task5: {}'.format(e5))
     
-    # try:        
-    #     task6()
-    #     print('Task 6 Testing Complete')
-    # except Exception as e6:
-    #     print('Unhandled exception in task6: {}'.format(e6))
+    try:
+        task6()
+        print('Task 6 Testing Complete')
+    except Exception as e6:
+        print('Unhandled exception in task6: {}'.format(e6))
     
     # args = [[7,5,0],[8,3,5],[9,3,8],[10,3,11],[11,2,14]]
     # #Tasks 7-11
