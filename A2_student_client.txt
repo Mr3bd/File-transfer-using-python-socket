@@ -1,0 +1,55 @@
+----------------------------------------
+Start of task7 Testing
+
+stp(client): socket created
+stp(client): sent: tricky!
+stp(client): sent: <configuration_complete>
+stp(client): received: #10:ILLEGAL_COMMAND#
+stp(client): connection shutdown
+stp(client): socket closed
+
+stp(client): socket created
+stp(client): sent: ?name:text1.txt?
+stp(client): sent: $size:104$
+stp(client): sent: $type:text$
+stp(client): sent: <configuration_complete>
+stp(client): received: #10:ILLEGAL_COMMAND#
+stp(client): connection shutdown
+stp(client): socket closed
+
+stp(client): socket created
+stp(client): sent: $type:pic$
+stp(client): sent: (size:6501)
+stp(client): sent: $name:text2.txt$
+stp(client): sent: <configuration_complete>
+stp(client): received: #10:ILLEGAL_COMMAND#
+stp(client): connection shutdown
+stp(client): socket closed
+
+stp(client): socket created
+stp(client): sent: $type:pic$
+stp(client): sent: $name:text3.txt$
+stp(client): sent: *size:7899*
+stp(client): sent: <configuration_complete>
+stp(client): received: #10:ILLEGAL_COMMAND#
+stp(client): connection shutdown
+stp(client): socket closed
+
+stp(client): socket created
+stp(client): sent: $type:text$
+stp(client): sent: $name:text4.txt$
+stp(client): sent: %size:6501%
+stp(client): sent: $count=7$
+stp(client): sent: <configuration_complete>
+stp(client): received: #10:ILLEGAL_COMMAND#
+stp(client): connection shutdown
+stp(client): socket closed
+
+End of task7 Testing
+----------------------------------------
+----------------------------------------
+Start of task8 Testing
+
+stp(client): socket created
+stp(client): sent: $type:text$
+stp(client): sent: <configuration_complete>

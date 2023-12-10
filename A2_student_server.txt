@@ -1,0 +1,39 @@
+----------------------------------------
+Start of task7 Testing
+
+stp(server): socket created
+stp(server): bound to ('localhost', 6330)
+stp(server): listening ...
+
+stp(server): accepted client connection 0
+sent responsestp(server): handle client error: stp(server): handle client error
+stp(client): connection shutdown
+stp(client): socket closed
+stp(server): accepted client connection 1
+sent responsestp(server): handle client error: stp(server): handle client error
+stp(client): connection shutdown
+stp(client): socket closed
+stp(server): accepted client connection 2
+sent responsestp(server): handle client error: stp(server): handle client error
+stp(client): connection shutdown
+stp(client): socket closed
+stp(server): accepted client connection 3
+sent responsestp(server): handle client error: stp(server): handle client error
+stp(client): connection shutdown
+stp(client): socket closed
+stp(server): accepted client connection 4
+sent responsestp(server): handle client error: stp(server): handle client error
+stp(client): connection shutdown
+stp(client): socket closed
+stp(server): socket closed
+
+End of task7 Testing
+----------------------------------------
+----------------------------------------
+Start of task8 Testing
+
+stp(server): socket created
+stp(server): bound to ('localhost', 6330)
+stp(server): listening ...
+
+stp(server): accepted client connection 0
