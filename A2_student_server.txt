@@ -1,4 +1,95 @@
 ----------------------------------------
+Start of task7 Testing
+
+stp(server): socket created
+stp(server): bound to ('localhost', 6330)
+stp(server): listening ...
+
+stp(server): accepted client connection #0
+stp(server): received: tricky!<configuration_complete>
+stp(server): sent: #10:ILLEGAL_COMMAND#
+stp(server): socket closed
+
+stp(server): accepted client connection #1
+stp(server): received: ?name:text1.txt?$size:104$$type:text$<configuration_complete>
+stp(server): sent: #10:ILLEGAL_COMMAND#
+stp(server): socket closed
+
+stp(server): accepted client connection #2
+stp(server): received: $type:pic$(size:6501)$name:text2.txt$<configuration_complete>
+stp(server): sent: #10:ILLEGAL_COMMAND#
+stp(server): socket closed
+
+stp(server): accepted client connection #3
+stp(server): received: $type:pic$$name:text3.txt$*size:7899*<configuration_complete>
+stp(server): sent: #10:ILLEGAL_COMMAND#
+stp(server): socket closed
+
+stp(server): accepted client connection #4
+stp(server): received: $type:text$$name:text4.txt$%size:6501%$count=7$<configuration_complete>
+stp(server): sent: #10:ILLEGAL_COMMAND#
+stp(server): socket closed
+
+stp(server): socket closed
+
+
+End of task7 Testing
+----------------------------------------
+----------------------------------------
+Start of task8 Testing
+
+stp(server): socket created
+stp(server): bound to ('localhost', 6330)
+stp(server): listening ...
+
+stp(server): accepted client connection #0
+stp(server): received: $type:text$<configuration_complete>
+stp(server): sent: #20:COMMAND_MISSING#
+stp(server): socket closed
+
+stp(server): accepted client connection #1
+stp(server): received: $type:text$$size:512$<configuration_complete>
+stp(server): sent: #20:COMMAND_MISSING#
+stp(server): socket closed
+
+stp(server): accepted client connection #2
+stp(server): received: $name:file3.txt$$count:30$$size:512$<configuration_complete>
+stp(server): sent: #20:COMMAND_MISSING#
+stp(server): socket closed
+
+stp(server): socket closed
+
+
+End of task8 Testing
+----------------------------------------
+----------------------------------------
+Start of task9 Testing
+
+stp(server): socket created
+stp(server): bound to ('localhost', 6330)
+stp(server): listening ...
+
+stp(server): accepted client connection #0
+stp(server): received: $type:pic$$size:6501$$name:text2$<configuration_complete>
+stp(server): sent: #30:BAD_CONFIGURATION#
+stp(server): socket closed
+
+stp(server): accepted client connection #1
+stp(server): received: $size:-4$$name:file2.pdf$$type:text$<configuration_complete>
+stp(server): sent: #30:BAD_CONFIGURATION#
+stp(server): socket closed
+
+stp(server): accepted client connection #2
+stp(server): received: $name:pic1.png$$size:1024$$type:mov$<configuration_complete>
+stp(server): sent: #30:BAD_CONFIGURATION#
+stp(server): socket closed
+
+stp(server): socket closed
+
+
+End of task9 Testing
+----------------------------------------
+----------------------------------------
 Start of task10 Testing
 
 stp(server): socket created
@@ -508,15 +599,4 @@ stp(server): socket closed
 
 
 End of task11 Testing
-----------------------------------------
-----------------------------------------
-Start of task12 Testing
-
-stp(server): socket created
-stp(server): bound to ('localhost', 6330)
-stp(server): listening ...
-
-stp(server): accepted client connection #0
-
-End of task12 Testing
 ----------------------------------------

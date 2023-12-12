@@ -350,8 +350,8 @@ def main():
     except Exception as e6:
         print('Unhandled exception in task6: {}'.format(e6))
     
-    args = [[10,3,11],[11,2,14]]
-    #args = [[7,5,0],[8,3,5],[9,3,8],[10,3,11],[11,2,14]]
+    # args = [[10,3,11],[11,2,14]]
+    args = [[7,5,0],[8,3,5],[9,3,8],[10,3,11],[11,2,14]]
     #Tasks 7-11
     for arg in args:
         try:
@@ -360,12 +360,12 @@ def main():
         except Exception as e:
             print('Unhandled exception in task{}: {}'.format(arg[0],e))
     
-    try:
-        task12()
-        print('Task 12 Testing Complete')
-    except Exception as e12:
-        print('Unhandled exception in task12: {}'.format(e12))
-                        
+    # try:
+    #     task12()
+    #     print('Task 12 Testing Complete')
+    # except Exception as e12:
+    #     print('Unhandled exception in task12: {}'.format(e12))
+    #
     return
 
 main()

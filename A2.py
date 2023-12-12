@@ -565,7 +565,6 @@ def get_parameter_value(commands, parameter):
     ---------------------------------------------------
     """
     if valid_commands_format(commands):
-        print(commands)
         if type(commands) is list:
             for c in commands:
                 if parameter in c:
