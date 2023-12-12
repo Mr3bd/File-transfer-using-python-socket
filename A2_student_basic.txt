@@ -1,10 +1,10 @@
 ----------------------------------------
 Start of task1 Testing
 
-get_file_parameters(sample1.txt ) = ['$name:sample1.txt$', '$type:text$', '$size:607$']
+get_file_parameters(sample1.txt ) = ['$name:sample1.txt$', '$type:text$', '$size:612$']
 get_file_parameters(sample2.html) = ['$name:sample2.html$', '$type:text$', '$size:406$']
 get_file_parameters(sample3.rtf ) = ['$name:sample3.rtf$', '$type:text$', '$size:42649$']
-get_file_parameters(sample4.png ) = ['$name:sample4.png$', '$type:pic$', '$size:4520$']
+get_file_parameters(sample4.png ) = ['$name:sample4.png$', '$type:pic$', '$size:4525$']
 get_file_parameters(sample5.jpg ) = ['$name:sample5.jpg$', '$type:pic$', '$size:7876$']
 get_file_parameters(sample6.gif ) = ['$name:sample6.gif$', '$type:pic$']
 get_file_parameters(sample7.pdf ) = ['$name:sample7.pdf$', '$size:3028$']
@@ -42,6 +42,7 @@ Case 1: invalid socket type
 False
 Case 2: socket of type server
 stp(server): socket closed
+
 True
 Case 3: socket of type client
 stp(client): socket closed
@@ -49,11 +50,13 @@ True
 Case 4: connected socket
 stp(client): connection shutdown
 stp(client): socket closed
+
 True
 Case 5: closed socket
 False
 Case 6: listening socket
 stp(server): socket closed
+
 True
 
 End of task3 Testing
@@ -103,10 +106,10 @@ validate_configuration(['$type:text$', '$name:file1.t.xt$', '$size:78$']):
 ('#30:BAD_CONFIGURATION#', [])
 
 validate_configuration(['$name:file1.txt$', '$type:text$', '$size:75$']):
-('configuration_approved', ['$name:file1.txt$', '$type:text$', '$size:75$'])
+('<configuration_approved>', ['$name:file1.txt$', '$type:text$', '$size:75$'])
 
 validate_configuration(['$name:r.jpg$', '$type:pic$', '$pad:q$', '$size:7$']):
-('configuration_approved', ['$name:r.jpg$', '$type:pic$', '$pad:q$', '$size:7$'])
+('<configuration_approved>', ['$name:r.jpg$', '$type:pic$', '$pad:q$', '$size:7$'])
 
 End of task5 Testing
 ----------------------------------------

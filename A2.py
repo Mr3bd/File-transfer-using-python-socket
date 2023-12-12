@@ -130,10 +130,11 @@ def stp_server(filename, server_address, client_count):
 
     for n in range(client_count):
         client_socket, client_address = server_socket.accept()
-        write(filename, 'stp(server): accepted client connection {}\n'.format(n))
+        write(filename, 'stp(server): accepted client connection #{}\n'.format(n))
         handle_client(filename, client_socket)
+        write(filename, 'stp(server): socket closed\n\n')
 
-    close_socket(filename, server_socket, sock_type='server')
+    close_socket(filename,server_socket, 'server')
     return
 
 
@@ -159,19 +160,15 @@ def handle_client(filename, connection):
     try:
         response, commands = receive_commands(filename, connection)
 
-        if not commands or response != 'configuration_approved':
-            raise Exception('stp(server): handle client error')
+        if response == '<configuration_approved>':
 
-        # download_success = download_file(filename, connection, commands)
-
-        # if not download_success:
-        #     raise Exception('stp(server): handle client error')
+            download_success = download_file(filename, connection, commands)
+            if not download_success:
+                raise Exception('stp(server): handle client error')
 
     except Exception as e:
         write(filename, f'stp(server): handle client error: {e}\n')
 
-    finally:
-        close_socket(filename, connection)
     return
 
 
@@ -199,26 +196,24 @@ def receive_commands(filename, connection):
     """
     try:
 
-        received_commands = []
+        received_commands = ''
 
         while True:
             data = connection.recv(BUFFER).decode(ENCODING)
-
-            if data == '<configuration_complete>':
+            received_commands += data
+            if '<configuration_complete>' in received_commands:
                 break
-            received_commands.append(data)
-
-
-        tup = validate_configuration(received_commands)
+        write(filename, 'stp(server): received: {}\n'.format(received_commands))
+        string_to_check = received_commands.replace('<configuration_complete>', "")
+        tup = validate_configuration(string_to_check)
         res = tup[0]
-        print(res)
-        if res == '<configuration_complete>':
-            write(filename, res)
+        # print(res)
         connection.sendall(res.encode(ENCODING))
-        write(filename, 'sent response')
-        rescopy = ''.format(res)
+        write(filename, 'stp(server): sent: {}\n'.format(res))
+        res_copy = res
+        com_copy = received_commands
 
-        return rescopy, received_commands.copy()
+        return res_copy, com_copy
 
     except Exception as e:
         return "Error", []
@@ -228,37 +223,43 @@ def receive_commands(filename, connection):
 
 
 def validate_configuration(commands):
-    print(commands)
     if not valid_commands_format(commands):
         return ('#10:ILLEGAL_COMMAND#', [])
     else:
         hasname = False
         hastype = False
         hassize = False
-        for c in commands:
+        coms = []
+        if type(commands) is list:
+            coms = commands
+        else:
+            coms.append(commands)
+
+        for c in coms:
             if 'name' in c:
-                fname = get_parameter_value(commands, 'name')
+                fname = get_parameter_value(coms, 'name')
                 hasname = True
-            elif 'type' in c:
-                ftype = get_parameter_value(commands, 'type')
+            if 'type' in c:
+                ftype = get_parameter_value(coms, 'type')
                 hastype = True
-            elif 'size' in c:
-                fsize = get_parameter_value(commands, 'size')
+
+            if 'size' in c:
+                fsize = get_parameter_value(coms, 'size')
                 hassize = True
-        print(hasname, hastype, hassize)
         if hasname and hastype and hassize:
-            for c in commands:
+            for c in coms:
                 if 'name' in c:
                     if fname is None or not valid_filename(fname):
                         return '#30:BAD_CONFIGURATION#', []
 
                 if 'type' in c:
-                    if ftype is None:
+                    if ftype is None or (ftype != 'text' and ftype != 'pic'):
                         return '#30:BAD_CONFIGURATION#', []
                     else:
                         dot_index = fname.rfind(".")
                         if dot_index != -1:
                             file_extension = fname[dot_index + 1:]
+
                             if (file_extension not in TEXT_EXTENSIONS) and (file_extension not in PIC_EXTENSIONS):
                                 return '#30:BAD_CONFIGURATION#', []
                         else:
@@ -273,7 +274,7 @@ def validate_configuration(commands):
                             return '#30:BAD_CONFIGURATION#', []
                     else:
                         return '#30:BAD_CONFIGURATION#', []
-            return 'configuration_approved', commands
+            return '<configuration_approved>', coms
         else:
             return '#20:COMMAND_MISSING#', []
 
@@ -327,27 +328,24 @@ def download_file(out_filename, sock, commands):
                       write to file every received block
     ---------------------------------------------------
     """
-    dot_index = out_filename.rfind(".")
-    file_name = out_filename[:dot_index]
-    file_extension = out_filename[dot_index + 1:]
-
     try:
-        file_new_name = '{}.{}'.format(file_name, file_extension)
-        write(out_filename, f'stp(server): downloading ...\n')
-
-        with open(file_new_name, 'wb') as file:
+        f_name = get_parameter_value(commands.replace('<configuration_complete>', ""), 'name')
+        dot_index = f_name.find('.')
+        write(out_filename, 'stp(server): configuration:\n')
+        write(out_filename, 'stp(server): downloading...\n')
+        with open('{}_copy.txt'.format(f_name[:dot_index]), 'wb') as file:
             while True:
                 data = sock.recv(BLOCK_SIZE)
                 if not data:
                     break
                 file.write(data)
-                write(out_filename, f'stp(server): received block\n')
+                write(out_filename, 'stp(server): received {} \n'.format(data))
 
-        write(out_filename, f'stp(server): download complete\n')
+        write(out_filename, 'stp(server): download complete\n')
         return True
 
     except Exception as e:
-        write(out_filename, f'stp(server): receive error: {e}\n')
+        write(out_filename, 'stp(server): receive error: {}\n'.format(e))
         return False
 
 
@@ -428,28 +426,28 @@ def close_socket(filename, sock, sock_type='client'):
                 write(filename, 'stp(client): connection shutdown\n')
                 try:
                     sock.close()
-                    write(filename, 'stp(client): socket closed\n')
+                    write(filename, 'stp(client): socket closed\n\n')
                     res = True
                 except:
                     write(filename, 'stp(client): socket close failed\n')
             except:
-                write(filename, 'stp(client): shutdown failed\n')
+                write(filename, 'stp(client): shutdown failed\n\n')
         except:
             try:
                 sock.close()
                 write(filename, 'stp(client): socket closed\n')
                 res = True
             except:
-                write(filename, 'stp(client): socket close failed\n')
+                write(filename, 'stp(client): socket close failed\n\n')
         # res = True
 
     elif sock_type == 'server':
         try:
             sock.close()
-            write(filename, 'stp(server): socket closed\n')
+            write(filename, 'stp(server): socket closed\n\n')
             res = True
         except Exception as e:
-            write(filename, 'stp(server): socket close failed\n')
+            write(filename, 'stp(server): socket close failed\n\n')
 
     return res
     """
@@ -567,18 +565,25 @@ def get_parameter_value(commands, parameter):
     ---------------------------------------------------
     """
     if valid_commands_format(commands):
+        print(commands)
         if type(commands) is list:
             for c in commands:
                 if parameter in c:
-                    start_index = c.find(':')
-                    end_index = c.find('$', start_index + 1)
-                    value = c[start_index + 1:end_index]
-                    return value
+                    start_index = c.find('{}'.format(parameter))
+                    val = c[start_index:]
+                    semi_index = val.find(":")
+                    dollar_index = val.find("$")
+                    if semi_index == -1 or dollar_index == -1:
+                        return None
+                    else:
+                        val = val[semi_index + 1:dollar_index]
+
+                    return val
         else:
             start_index = commands.find('{}'.format(parameter))
             val = commands[start_index:]
-            semi_index = val.rfind(":")
-            dollar_index = val.rfind("$")
+            semi_index = val.find(":")
+            dollar_index = val.find("$")
             if semi_index == -1 or dollar_index == -1:
                 return None
             else:
@@ -626,13 +631,18 @@ def stp_client(out_filename, server, filename=None, commands=None, i=None):
             if commands:
                 result = send_commands(out_filename, client_sock, commands)
                 if result:
-                    get_config_response(out_filename, client_sock)
+                    response = get_config_response(out_filename, client_sock)
+                    if 'configuration_approved' in response:
+
+                        upload_res = upload_file(out_filename, client_sock, commands)
+
+                        # print('ready to upload')
+                        # upload file
+
+            close_socket(out_filename, client_sock, 'client')
 
         except Exception as e:
             write(out_filename, 'stp(client): Exception: {}'.format(e))
-        finally:
-            close_socket(out_filename, client_sock, 'client')
-
 
     except Exception as e:
         write(out_filename, 'stp(client): Exception: {}'.format(e))
@@ -694,7 +704,7 @@ def send_commands(filename, sock, commands):
         for command in commands:
             sock.sendall(command.encode(ENCODING))
             write(filename, 'stp(client): sent: {}\n'.format(command))
-
+        # print('client sent all commands')
         completion_command = '<configuration_complete>'
         sock.sendall(completion_command.encode(ENCODING))
         write(filename, 'stp(client): sent: {}\n'.format(completion_command))
@@ -726,12 +736,15 @@ def get_config_response(filename, sock):
     ---------------------------------------------------
     """
     try:
+        # print('wait to get response from server')
         response = sock.recv(BUFFER).decode(ENCODING)
+        # print('received response from server: {}'.format(response))
         write(filename, 'stp(client): received: {}\n'.format(response))
         return response
 
     except Exception as e:
         write(filename, f'stp(client): configuration receive error: {e}\n')
+        # ('response from server is empty')
         return ''
 
 
@@ -757,12 +770,13 @@ def upload_file(out_filename, sock, commands):
                   other errors: 'stp(client): uploading failed: <Exception>', return False
     ---------------------------------------------------
     """
-    if not valid_commands_format(commands):
-        return False
-    try:
-        write(out_filename, 'stp(client): uploading {} ...'.format(out_filename))
 
-        with open(out_filename, 'rb') as file:
+    f_name = get_parameter_value(commands, 'name')
+
+    try:
+        write(out_filename, 'stp(client): uploading ...\n')
+
+        with open(f_name, 'rb') as file:
             while True:
                 block = file.read(BLOCK_SIZE)
 
@@ -770,9 +784,9 @@ def upload_file(out_filename, sock, commands):
                     break
 
                 sock.sendall(block)
-                write(out_filename, 'stp(client): sent: block')
+                write(out_filename, 'stp(client): sent: {}\n'.format(block))
 
-        write(out_filename, 'stp(client): uploading complete')
+        write(out_filename, 'stp(client): uploading complete\n')
         return True
 
     except FileNotFoundError:
@@ -780,7 +794,7 @@ def upload_file(out_filename, sock, commands):
         return False
 
     except Exception as e:
-        write(out_filename, 'stp(client): uploading failed: {}'.format(e))
+        write(out_filename, 'stp(client): uploading failed: {}\n'.format(e))
         return False
 
 
