@@ -344,19 +344,23 @@ def download_file(out_filename, sock, commands):
                 mode = 'w'
             elif file_extension in PIC_EXTENSIONS:
                 mode = 'wb'
-            
+
+            down_file_name = '{}_copy.{}'.format(f_name[:dot_index],file_extension)
+
             if mode is not None:
-                with open('{}_copy.txt'.format(f_name[:dot_index]), mode) as file:
+                with open(down_file_name, mode) as file:
                     while True:
                         data = sock.recv(BLOCK_SIZE)
                         if not data:
                             break
+
                         if mode == 'w':
                             file.write(data.decode(ENCODING))
                             if str(data) != "b' '":
                                 write(out_filename, 'stp(server): received: {}\n'.format(str(data)))
                         else:
-                            file.write(data)
+                            trimmed_block = data.rstrip(b' ')
+                            file.write(trimmed_block)
                             if str(data) != "b' '":
                                 write(out_filename, 'stp(server): received: {}\n'.format(data))
             else:
@@ -387,7 +391,7 @@ def get_file_parameters(filename):
             type = '$type:text$'
             list.append(type)
             try:
-                with open(filename, 'r', encoding='utf-8') as file:
+                with open(filename, 'r') as file:
                     content = file.read()
                     total_characters = 0
                     total_characters += len(content)
@@ -395,17 +399,25 @@ def get_file_parameters(filename):
                     list.append(size)
             except FileNotFoundError:
                 pass
+
         elif file_extension.lower() in PIC_EXTENSIONS:
             type = '$type:pic$'
             list.append(type)
-
-        if file_extension.lower() not in TEXT_EXTENSIONS:
             try:
                 with open(filename, 'rb') as file:
                     byte_count = 0
                     while file.read(1):
                         byte_count += 1
                     size = '$size:{}$'.format(byte_count)
+                    list.append(size)
+            except FileNotFoundError:
+                pass
+        else:
+            try:
+                with open(filename, 'rb') as file:
+                    file.seek(0, 2)  # Move the file cursor to the end
+                    size_bytes = file.tell()
+                    size = '$size:{}$'.format(size_bytes)
                     list.append(size)
             except FileNotFoundError:
                 pass
@@ -427,6 +439,7 @@ def get_file_parameters(filename):
     ---------------------------------------------------
     """
     # your code here
+
     return list
 
 
@@ -812,14 +825,15 @@ def upload_file(out_filename, sock, commands):
                         if not block:
                             break
                         if mode == 'r':
-                            sock.sendall(block.encode(ENCODING))
                             if str(block.encode(ENCODING)) != "b' '":
-                                write(out_filename, 'stp(client): sent: {}\n'.format(str(block.encode(ENCODING)).replace('     ',"")))
+                                sock.sendall(block.encode(ENCODING))
+                                write(out_filename, 'stp(client): sent: {}\n'.format(str(block.encode(ENCODING))))
 
                         else:
-                            sock.sendall(block)
                             if block != "b' '":
-                                write(out_filename, 'stp(client): sent: {}\n'.format(str(block).replace('     ',"")))
+                                trimmed_block = block.rstrip(b' ')
+                                sock.sendall(trimmed_block)
+                                write(out_filename, 'stp(client): sent: {}\n'.format(str(trimmed_block)))
 
 
             else:

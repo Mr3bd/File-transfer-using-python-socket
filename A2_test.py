@@ -263,7 +263,7 @@ def task(args):
     write(client_file,"\nStart of task{} Testing\n\n".format(num))
     
     for i in range(start,start+count):
-        stp_client(client_file,SERVER_ADDRESS,files[i],commands[i], i)
+        stp_client(client_file,SERVER_ADDRESS,files[i],commands[i])
         write(client_file,'\n')
     
     write(client_file,'End of task{} Testing\n'.format(num))
@@ -326,32 +326,31 @@ def main():
     except Exception as e2:
         print('Unhandled exception in task2: {}'.format(e2))
     
-    try:
+    try:        
         task3()
         print('Task 3 Testing Complete')
     except Exception as e3:
         print('Unhandled exception in task3: {}'.format(e3))
     
-    try:
+    try:        
         task4()
         print('Task 4 Testing Complete')
     except Exception as e4:
         print('Unhandled exception in task4: {}'.format(e4))
     
-    try:
+    try:        
         task5()
         print('Task 5 Testing Complete')
     except Exception as e5:
         print('Unhandled exception in task5: {}'.format(e5))
     
-    try:
+    try:        
         task6()
         print('Task 6 Testing Complete')
     except Exception as e6:
         print('Unhandled exception in task6: {}'.format(e6))
     
-    # args = [[10,3,11],[11,2,14]], ,[11,2,14]
-    args = [[7,5,0],[8,3,5],[9,3,8],[10,3,11], [11,2,14]]
+    args = [[7,5,0],[8,3,5],[9,3,8],[10,3,11],[11,2,14]]
     #Tasks 7-11
     for arg in args:
         try:
@@ -360,12 +359,12 @@ def main():
         except Exception as e:
             print('Unhandled exception in task{}: {}'.format(arg[0],e))
     
-    try:
+    try:        
         task12()
         print('Task 12 Testing Complete')
     except Exception as e12:
         print('Unhandled exception in task12: {}'.format(e12))
-
+                        
     return
 
 main()
