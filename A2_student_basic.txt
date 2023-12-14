@@ -7,7 +7,7 @@ get_file_parameters(sample3.rtf ) = ['$name:sample3.rtf$', '$type:text$', '$size
 get_file_parameters(sample4.png ) = ['$name:sample4.png$', '$type:pic$', '$size:4525$']
 get_file_parameters(sample5.jpg ) = ['$name:sample5.jpg$', '$type:pic$', '$size:7876$']
 get_file_parameters(sample6.gif ) = ['$name:sample6.gif$', '$type:pic$']
-get_file_parameters(sample7.pdf ) = ['$name:sample7.pdf$', '$size:3028$']
+get_file_parameters(sample7.pdf ) = ['$name:sample7.pdf$', '$size:2830$']
 get_file_parameters(readme      ) = []
 get_file_parameters(readme.txt  ) = ['$name:readme.txt$', '$type:text$']
 get_file_parameters(readme.pdf  ) = ['$name:readme.pdf$']
@@ -50,7 +50,6 @@ True
 Case 4: connected socket
 stp(client): connection shutdown
 stp(client): socket closed
-
 True
 Case 5: closed socket
 False

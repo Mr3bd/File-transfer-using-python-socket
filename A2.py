@@ -132,7 +132,7 @@ def stp_server(filename, server_address, client_count):
         client_socket, client_address = server_socket.accept()
         write(filename, 'stp(server): accepted client connection #{}\n'.format(n))
         handle_client(filename, client_socket)
-        write(filename, 'stp(server): socket closed\n\n')
+        
 
     close_socket(filename,server_socket, 'server')
     return
@@ -165,7 +165,7 @@ def handle_client(filename, connection):
             download_success = download_file(filename, connection, commands)
             if not download_success:
                 raise Exception('stp(server): handle client error')
-
+        
     except Exception as e:
         write(filename, f'stp(server): handle client error: {e}\n')
 
@@ -333,13 +333,33 @@ def download_file(out_filename, sock, commands):
         dot_index = f_name.find('.')
         write(out_filename, 'stp(server): configuration:\n')
         write(out_filename, 'stp(server): downloading...\n')
-        with open('{}_copy.txt'.format(f_name[:dot_index]), 'wb') as file:
-            while True:
-                data = sock.recv(BLOCK_SIZE)
-                if not data:
-                    break
-                file.write(data)
-                write(out_filename, 'stp(server): received {} \n'.format(data))
+        
+        if dot_index != -1:
+            file_extension = f_name[dot_index + 1:]
+            mode = None
+            
+            if file_extension in TEXT_EXTENSIONS:
+                mode = 'w'
+            elif file_extension in PIC_EXTENSIONS:
+                mode = 'wb'
+            
+            if mode is not None:
+                with open('{}_copy.txt'.format(f_name[:dot_index]), mode) as file:
+                    while True:
+                        data = sock.recv(BLOCK_SIZE)
+                        if not data:
+                            break
+                        if mode == 'w':
+                            file.write(data.decode(ENCODING))
+                            if str(data) != "b' '":
+                                write(out_filename, 'stp(server): received {} \n'.format(str(data)))
+                        else:
+                            file.write(data)
+                            if str(data) != "b' '":
+                                write(out_filename, 'stp(server): received {} \n'.format(data))
+            else:
+                write(out_filename, 'stp(server): receive error\n')
+                return False
 
         write(out_filename, 'stp(server): download complete\n')
         return True
@@ -426,12 +446,12 @@ def close_socket(filename, sock, sock_type='client'):
                 write(filename, 'stp(client): connection shutdown\n')
                 try:
                     sock.close()
-                    write(filename, 'stp(client): socket closed\n\n')
+                    write(filename, 'stp(client): socket closed\n')
                     res = True
                 except:
                     write(filename, 'stp(client): socket close failed\n')
-            except:
-                write(filename, 'stp(client): shutdown failed\n\n')
+            except Exception as e:
+                write(filename, 'stp(client): shutdown failed\n')
         except:
             try:
                 sock.close()
@@ -637,15 +657,13 @@ def stp_client(out_filename, server, filename=None, commands=None, i=None):
 
                         # print('ready to upload')
                         # upload file
-
-            close_socket(out_filename, client_sock, 'client')
-
         except Exception as e:
             write(out_filename, 'stp(client): Exception: {}'.format(e))
-
+            close_socket(out_filename, client_sock, 'client')
+        finally:
+            close_socket(out_filename, client_sock, 'client')
     except Exception as e:
         write(out_filename, 'stp(client): Exception: {}'.format(e))
-
 
 
 '____________________________________________________'
@@ -673,7 +691,7 @@ def connect_to_server(filename, sock, server, ):
         return True
 
     except:
-        write(filename, 'stp(client): connect fatal error')
+        write(filename, 'stp(client): connect fatal error\n')
         close_socket(filename, sock, 'client')
         return False
 
@@ -774,16 +792,37 @@ def upload_file(out_filename, sock, commands):
 
     try:
         write(out_filename, 'stp(client): uploading ...\n')
+        dot_index = f_name.rfind(".")
+        if dot_index != -1:
+            file_extension = f_name[dot_index + 1:]
+            mode = None
+            
+            if file_extension in TEXT_EXTENSIONS:
+                mode = 'r'
+            elif file_extension in PIC_EXTENSIONS:
+                mode = 'rb'
+            
+            if mode is not None:
+                with open(f_name, mode) as file:
+                    while True:
+                        block = file.read(BLOCK_SIZE)
 
-        with open(f_name, 'rb') as file:
-            while True:
-                block = file.read(BLOCK_SIZE)
+                        if not block:
+                            break
+                        if mode == 'r':
+                            sock.sendall(block.encode(ENCODING))
+                            if str(block.encode(ENCODING)) != "b' '":
+                                write(out_filename, 'stp(client): sent: {}\n'.format(str(block.encode(ENCODING)).replace('     ',"")))
 
-                if not block:
-                    break
+                        else:
+                            sock.sendall(block)
+                            if block != "b' '":
+                                write(out_filename, 'stp(client): sent: {}\n'.format(str(block).replace('     ',"")))
 
-                sock.sendall(block)
-                write(out_filename, 'stp(client): sent: {}\n'.format(block))
+
+            else:
+                write(out_filename, 'stp(client): uploading failed\n')
+                return False
 
         write(out_filename, 'stp(client): uploading complete\n')
         return True
