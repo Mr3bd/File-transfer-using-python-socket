@@ -130,10 +130,12 @@ def stp_server(filename, server_address, client_count):
 
     for n in range(client_count):
         client_socket, client_address = server_socket.accept()
-        write(filename, 'stp(server): accepted client connection #{}\n'.format(n))
+        write(filename, 'stp(server): accepted client connection #{}\n'.format(n+1))
         handle_client(filename, client_socket)
-        
+        close_socket(filename,client_socket, 'server')
+        write(filename, '\n')
 
+        
     close_socket(filename,server_socket, 'server')
     return
 
@@ -332,7 +334,7 @@ def download_file(out_filename, sock, commands):
         f_name = get_parameter_value(commands.replace('<configuration_complete>', ""), 'name')
         dot_index = f_name.find('.')
         write(out_filename, 'stp(server): configuration:\n')
-        write(out_filename, 'stp(server): downloading...\n')
+        write(out_filename, 'stp(server): downloading ...\n')
         
         if dot_index != -1:
             file_extension = f_name[dot_index + 1:]
@@ -352,11 +354,11 @@ def download_file(out_filename, sock, commands):
                         if mode == 'w':
                             file.write(data.decode(ENCODING))
                             if str(data) != "b' '":
-                                write(out_filename, 'stp(server): received {} \n'.format(str(data)))
+                                write(out_filename, 'stp(server): received: {}\n'.format(str(data)))
                         else:
                             file.write(data)
                             if str(data) != "b' '":
-                                write(out_filename, 'stp(server): received {} \n'.format(data))
+                                write(out_filename, 'stp(server): received: {}\n'.format(data))
             else:
                 write(out_filename, 'stp(server): receive error\n')
                 return False
@@ -464,10 +466,10 @@ def close_socket(filename, sock, sock_type='client'):
     elif sock_type == 'server':
         try:
             sock.close()
-            write(filename, 'stp(server): socket closed\n\n')
+            write(filename, 'stp(server): socket closed\n')
             res = True
         except Exception as e:
-            write(filename, 'stp(server): socket close failed\n\n')
+            write(filename, 'stp(server): socket close failed\n')
 
     return res
     """
@@ -647,16 +649,16 @@ def stp_client(out_filename, server, filename=None, commands=None, i=None):
         client_sock = prepare_socket(out_filename, 'client')
         try:
             connect_to_server(out_filename, client_sock, server)
-            if commands:
+            if commands is None:
+                commands = get_file_parameters(filename)
+            if len(commands) > 0:
                 result = send_commands(out_filename, client_sock, commands)
                 if result:
                     response = get_config_response(out_filename, client_sock)
                     if 'configuration_approved' in response:
-
                         upload_res = upload_file(out_filename, client_sock, commands)
 
-                        # print('ready to upload')
-                        # upload file
+
         except Exception as e:
             write(out_filename, 'stp(client): Exception: {}'.format(e))
             close_socket(out_filename, client_sock, 'client')

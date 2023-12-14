@@ -614,3 +614,40 @@ stp(client): socket closed
 
 End of task11 Testing
 ----------------------------------------
+----------------------------------------
+Start of task12 Testing
+
+stp(client): socket created
+stp(client): sent: $name:sample2.html$
+stp(client): sent: $type:text$
+stp(client): sent: $size:406$
+stp(client): sent: <configuration_complete>
+stp(client): received: <configuration_approved>
+stp(client): uploading ...
+stp(client): sent: b'<!DOCTYPE html>\n\n<html>\n<head>\n  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>\n  <title>Spoon-Knife</titl'
+stp(client): sent: b'e>\n  <LINK href="styles.css" rel="stylesheet" type="text/css">\n</head>\n\n<body>\n\n<img src="forkit.gif" id="octocat" alt="" />\n\n<!'
+stp(client): sent: b'-- This is a sample html file -->\n<p>\n  Network Programming and Applications\n</p>\n<p>\n  Princess Sumaya University of Technology'
+stp(client): sent: b'\n</p>\n\n</body>\n</html>'
+stp(client): uploading complete
+stp(client): connection shutdown
+stp(client): socket closed
+
+stp(client): socket created
+stp(client): sent: $name:sample4_copy.png$
+stp(client): sent: $type:pic$
+stp(client): sent: $size:0$
+stp(client): sent: <configuration_complete>
+stp(client): received: #30:BAD_CONFIGURATION#
+stp(client): connection shutdown
+stp(client): socket closed
+
+stp(client): socket created
+stp(client): sent: $name:sample7.pdf$
+stp(client): sent: $size:3028$
+stp(client): sent: <configuration_complete>
+stp(client): received: #20:COMMAND_MISSING#
+stp(client): connection shutdown
+stp(client): socket closed
+
+End of task12 Testing
+----------------------------------------

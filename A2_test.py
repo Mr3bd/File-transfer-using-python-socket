@@ -360,12 +360,12 @@ def main():
         except Exception as e:
             print('Unhandled exception in task{}: {}'.format(arg[0],e))
     
-    # try:
-    #     task12()
-    #     print('Task 12 Testing Complete')
-    # except Exception as e12:
-    #     print('Unhandled exception in task12: {}'.format(e12))
-    #
+    try:
+        task12()
+        print('Task 12 Testing Complete')
+    except Exception as e12:
+        print('Unhandled exception in task12: {}'.format(e12))
+
     return
 
 main()
